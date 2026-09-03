@@ -2,8 +2,6 @@
   "use strict";
 
   const API = window.STARS_API_BASE_URL;
-  const DEFAULT_TITLE_PREFERRED =
-    "Cutting, Punching, and Press Machine Setters, Operators, and Tenders, Metal and Plastic";
 
   const statusBanner = document.getElementById("status-banner");
   function showError(message) {
@@ -291,13 +289,6 @@
     return {
       init(titles) {
         combobox = createCombobox(input, listEl, titles);
-        const defaultTitle = titles.includes(DEFAULT_TITLE_PREFERRED)
-          ? DEFAULT_TITLE_PREFERRED
-          : titles[0];
-        if (defaultTitle) {
-          combobox.setValue(defaultTitle);
-          runSearch();
-        }
       },
     };
   }
