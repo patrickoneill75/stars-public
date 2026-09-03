@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>STARs Talent Transfer Explorer</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>STARs Talent Transfer Explorer</h1>
+    <p class="subtitle">Skills-based pathways into better-fit jobs</p>
+  </header>
+
+  <div id="status-banner" class="status-banner error hidden"></div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="employer" type="button">For Employers</button>
+    <button class="tab-btn" data-tab="worker" type="button">For Workers</button>
+  </div>
+
+  <!-- =========================== EMPLOYER TAB =========================== -->
+  <section class="tab-panel active" id="tab-employer">
+    <div class="top-row">
+      <div class="col">
+        <p class="intro-text">
+          Choose the occupation you need to fill. The tool ranks other occupations by how closely their
+          <strong>35 O*NET skill-importance scores</strong> match the target job, then layers in
+          <strong>Indiana wage data</strong> and a <strong>directional skill-gap analysis</strong>.
+        </p>
+
+        <div class="control-panel">
+          <div class="field">
+            <label for="employer-target-input">Occupation you need to fill</label>
+            <div class="hint">Type to search the occupation list.</div>
+            <div class="combobox" id="employer-combobox">
+              <input type="text" id="employer-target-input" autocomplete="off" placeholder="Search occupations…" />
+              <div class="combobox-list" id="employer-combobox-list"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="employer-result-count">Number of results: <span class="slider-value" id="employer-result-count-value">20</span></label>
+            <input type="range" id="employer-result-count" min="5" max="50" step="5" value="20" />
+          </div>
+
+          <div class="field checkbox-field">
+            <input type="checkbox" id="employer-lower-wage-only" checked />
+            <label for="employer-lower-wage-only">Only show occupations earning less than the target occupation</label>
+          </div>
+
+          <div class="field">
+            <button class="primary" id="employer-find-button" type="button">Find transferable occupations</button>
+          </div>
+        </div>
+
+        <div class="summary-panel" id="employer-target-summary"></div>
+      </div>
+      <div class="col"></div>
+    </div>
+
+    <div class="results-row">
+      <div class="col">
+        <div class="section-header">
+          <h3>Transfer occupation rank</h3>
+          <p>Click any occupation row to update the skills-gap analysis.</p>
+        </div>
+        <div class="table-scroll">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th style="width:46%">Transfer occupation</th>
+                <th style="width:18%">Skill similarity</th>
+                <th style="width:18%">Indiana median wage</th>
+                <th style="width:18%">Average wage increase</th>
+              </tr>
+            </thead>
+            <tbody id="employer-results-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="section-header">
+          <div id="employer-skill-gap-heading"><h3>Skills gap</h3></div>
+        </div>
+        <div class="table-scroll">
+          <table class="gap-table">
+            <thead>
+              <tr>
+                <th style="width:25%">Skill to build</th>
+                <th style="width:12%">Gap</th>
+                <th style="width:63%">Development Focus</th>
+              </tr>
+            </thead>
+            <tbody id="employer-gap-body"></tbody>
+          </table>
+        </div>
+        <div class="gap-note" id="employer-gap-note"></div>
+      </div>
+    </div>
+
+    <details class="how-it-works">
+      <summary>How the employer tool works</summary>
+      <ul>
+        <li><strong>Ranking:</strong> The original STARs model is preserved: Euclidean distance across 35 O*NET skill-importance scores. Smaller distance = closer occupational skill profile. This is what the table is sorted by.</li>
+        <li><strong>Skill similarity:</strong> A 0–100% readout of that same Euclidean distance, scaled against the largest distance two occupations could possibly have (every skill rated 1–5, so 100% = identical skill profile, 0% = as different as two profiles can be). It's not a separate score — it moves in lockstep with the ranking, just in a more human-readable form.</li>
+        <li><strong>Average wage increase:</strong> The percentage increase from the transfer occupation's Indiana annual wage to the target occupation's Indiana annual wage.</li>
+        <li><strong>Wage matching:</strong> The workbook's Indiana wage data use the BLS May 2019/2020 hybrid OEWS occupation structure. The app first matches by title/SOC, then uses the official BLS hybrid crosswalk where needed.</li>
+        <li><strong>Wage filter:</strong> When selected, results only include occupations with a lower Indiana annual median wage than the target occupation.</li>
+        <li><strong>Skill gaps:</strong> These are directional. The tool shows skills that are more important in the employer's target occupation than in the potential transfer occupation.</li>
+        <li><strong>Gap %:</strong> The displayed percentage is the transfer occupation's shortfall relative to the target occupation's O*NET importance score: (target − source) / target.</li>
+        <li><strong>Important:</strong> This is an occupation-level talent-pool screening tool, not an assessment of an individual applicant and not a substitute for required licenses, credentials, safety training, or employer-specific qualification.</li>
+      </ul>
+    </details>
+  </section>
+
+  <!-- =========================== WORKER TAB =========================== -->
+  <section class="tab-panel" id="tab-worker">
+    <div class="top-row">
+      <div class="col">
+        <p class="intro-text">
+          Choose your current occupation. The tool ranks other occupations that use similar skills, then helps you
+          identify <strong>higher-wage career pathways</strong> and the specific skills you may need to build to make the move.
+        </p>
+
+        <div class="control-panel">
+          <div class="field">
+            <label for="worker-current-input">Your current occupation</label>
+            <div class="hint">Type to search the occupation list.</div>
+            <div class="combobox" id="worker-combobox">
+              <input type="text" id="worker-current-input" autocomplete="off" placeholder="Search occupations…" />
+              <div class="combobox-list" id="worker-combobox-list"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="worker-result-count">Number of results: <span class="slider-value" id="worker-result-count-value">20</span></label>
+            <input type="range" id="worker-result-count" min="5" max="50" step="5" value="20" />
+          </div>
+
+          <div class="field checkbox-field">
+            <input type="checkbox" id="worker-higher-wage-only" checked />
+            <label for="worker-higher-wage-only">Only show occupations earning more than your current occupation</label>
+          </div>
+
+          <div class="field">
+            <button class="primary" id="worker-find-button" type="button">Find higher-wage career options</button>
+          </div>
+        </div>
+
+        <div class="summary-panel" id="worker-current-summary"></div>
+      </div>
+      <div class="col"></div>
+    </div>
+
+    <div class="results-row">
+      <div class="col">
+        <div class="section-header">
+          <h3>Career option rank</h3>
+          <p>Click any occupation row to update the skills-to-build analysis.</p>
+        </div>
+        <div class="table-scroll">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th style="width:46%">Potential occupation</th>
+                <th style="width:18%">Skill similarity</th>
+                <th style="width:18%">Indiana median wage</th>
+                <th style="width:18%">Average wage increase</th>
+              </tr>
+            </thead>
+            <tbody id="worker-results-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="section-header">
+          <div id="worker-skill-gap-heading"><h3>Skills to build</h3></div>
+        </div>
+        <div class="table-scroll">
+          <table class="gap-table">
+            <thead>
+              <tr>
+                <th style="width:25%">Skill to build</th>
+                <th style="width:12%">Gap</th>
+                <th style="width:63%">Development Focus</th>
+              </tr>
+            </thead>
+            <tbody id="worker-gap-body"></tbody>
+          </table>
+        </div>
+        <div class="gap-note" id="worker-gap-note"></div>
+      </div>
+    </div>
+
+    <details class="how-it-works">
+      <summary>How the worker tool works</summary>
+      <ul>
+        <li><strong>Start with your current occupation:</strong> The model treats your current job as evidence of skills you may already have developed through work experience.</li>
+        <li><strong>Ranking:</strong> Potential next occupations are ranked using the same Euclidean distance across 35 O*NET skill-importance scores used in the employer tool.</li>
+        <li><strong>Skill similarity:</strong> A 0–100% readout of that same Euclidean distance (see the employer tool's explanation for how it's scaled). Higher scores mean the potential occupation has a skill profile more similar to your current occupation, and the percentage always agrees with the table's sort order.</li>
+        <li><strong>Average wage increase:</strong> The percentage increase from your current occupation's Indiana annual median wage to the potential occupation's Indiana annual median wage.</li>
+        <li><strong>Wage filter:</strong> When selected, results only include occupations with a higher Indiana annual median wage than your current occupation.</li>
+        <li><strong>Skills to build:</strong> Clicking a potential occupation compares that target job with your current occupation and identifies the skills that are more important in the new job.</li>
+        <li><strong>Gap %:</strong> The displayed percentage is your current occupation's skill-importance shortfall relative to the potential target occupation: (target − current) / target.</li>
+        <li><strong>Important:</strong> This is an occupation-level career exploration tool. It does not assess an individual's actual proficiency, qualifications, education, licenses, or employer-specific requirements.</li>
+      </ul>
+    </details>
+  </section>
+</div>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
